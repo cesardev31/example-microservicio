@@ -7,13 +7,12 @@ const db = {
 
 // Función asincrónica para obtener todos los elementos de una tabla
 async function list(tabla) {
-  return db[tabla]; // Devuelve el arreglo correspondiente a la tabla
+  return db[tabla] || []; // Devuelve el arreglo correspondiente a la tabla
 }
 
 // Función asincrónica para obtener un elemento específico por su ID de una tabla
 async function get(tabla, id) {
   let col = await list(tabla); // Obtiene todos los elementos de la tabla
-  // Filtra los elementos para encontrar el que coincide con el ID proporcionado
   return col.filter((item) => item.id === id)[0] || null; // Devuelve el elemento encontrado o null si no se encuentra
 }
 
@@ -23,7 +22,6 @@ async function upsert(tabla, data) {
     db[tabla] = [];
   }
   await db[tabla].push(data); // Agrega el nuevo elemento al arreglo correspondiente a la tabla
-  console.log(db)
 }
 
 // Función asincrónica para eliminar un elemento de una tabla por su ID
@@ -39,10 +37,19 @@ async function remove(tabla, id) {
   }
 }
 
+async function query(tabla, q) {
+  let col = await list(tabla);
+  let keys = Object.keys(q);
+  let key = keys[0];
+  const result = col.filter((item) => item[key] === q[key])[0] || null;
+  return result;
+}
+
 // Exporta las funciones para ser utilizadas fuera de este módulo
 module.exports = {
   list,
   get,
   upsert,
   remove,
+  query,
 };
